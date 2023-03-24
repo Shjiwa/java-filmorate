@@ -2,7 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
@@ -16,20 +17,21 @@ import java.util.Map;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Integer, Film> films = new LinkedHashMap<>();
+    private int id = 1;
 
     @GetMapping
     public List<Film> getFilms() {
-        log.info("Количество фильмов в текущий момент: " + films.size());
+        log.info("Количество фильмов в текущий момент: {}", films.size());
         return new ArrayList<>(films.values());
     }
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        if (films.containsKey(film.getId())) {
-            log.error("Данный фильм уже существует.");
-            throw new ValidationException("Данный фильм уже существует.");
+        if (films.containsValue(film)) {
+            log.error("Already exist.");
+            throw new AlreadyExistException("Already exist.");
         }
-        film.setId(films.size() + 1);
+        film.setId(id++);
         films.put(film.getId(), film);
         log.info("Добавлен фильм: {} с id {}", film.getName(), film.getId());
         return film;
@@ -38,8 +40,8 @@ public class FilmController {
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
         if (!films.containsKey(film.getId())) {
-            log.error("Данного фильма не существует.");
-            throw new ValidationException("Данного фильма не существует.");
+            log.error("Not found.");
+            throw new NotFoundException("Not found.");
         }
         films.put(film.getId(), film);
         log.info("Обновлен фильм: {} с id {}", film.getName(), film.getId());
