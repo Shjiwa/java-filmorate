@@ -25,6 +25,7 @@ public class Film {
     private LocalDate releaseDate;
     @Positive(message = "Duration is negative.")
     private Integer duration;
+    private Integer rating;
 
     public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration) {
         this.id = id;
@@ -32,9 +33,5 @@ public class Film {
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-    }
-
-    public Set<Long> getLikes() {
-        return likes;
     }
 }
