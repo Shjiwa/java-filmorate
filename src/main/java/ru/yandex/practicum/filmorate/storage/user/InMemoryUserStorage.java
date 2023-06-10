@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
@@ -21,20 +23,17 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Map<Long, User> getMap() {
-        return users;
-    }
-
-    @Override
     public User createUser(User user) {
         user.setId(userId++);
         users.put(user.getId(), user);
+        log.info("Создан пользователь: {} с id {}", user.getName(), user.getId());
         return user;
     }
 
     @Override
     public User updateUser(User user) {
         users.put(user.getId(), user);
+        log.info("Пользователь с id {} обновлен", user.getId());
         return user;
     }
 
@@ -42,6 +41,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User addFriend(Long id, Long friendId) {
         users.get(id).getFriends().add(friendId);
         users.get(friendId).getFriends().add(id);
+        log.info("Пользователи с id: {} и {} теперь друзья", id, friendId);
         return users.get(id);
     }
 
@@ -49,6 +49,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User deleteFriend(Long id, Long friendId) {
         users.get(id).getFriends().remove(friendId);
         users.get(friendId).getFriends().remove(id);
+        log.info("Пользователи с id: {} и {} перестали быть друзьями", id, friendId);
         return users.get(id);
     }
 
