@@ -10,7 +10,7 @@ public class ExceptionService {
         throw new NotFoundException("Not found");
     }
 
-    public void throwBadRequest() {
-        throw new BadRequestException("Bad request");
+    public void throwBadRequest(String message) {
+        throw new BadRequestException(message);
     }
 }
