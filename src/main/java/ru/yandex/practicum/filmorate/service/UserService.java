@@ -12,14 +12,28 @@ import java.util.List;
 public class UserService {
     private final UserStorage userStorage;
 
-    public User addFriend(Long id, Long friendId) {
-        userStorage.addFriend(id, friendId);
+    public User createUser(User user) {
+        return userStorage.createUser(user);
+    }
+
+    public List<User> getUsers() {
+        return userStorage.getUsers();
+    }
+
+    public User updateUser(User user) {
+        return userStorage.updateUser(user);
+    }
+
+    public User getUserById(Long id) {
         return userStorage.getUserById(id);
     }
 
+    public User addFriend(Long id, Long friendId) {
+        return userStorage.addFriend(id, friendId);
+    }
+
     public User deleteFriend(Long id, Long friendId) {
-        userStorage.deleteFriend(id, friendId);
-        return userStorage.getUserById(id);
+        return userStorage.deleteFriend(id, friendId);
     }
 
     public List<User> getFriends(Long id) {
