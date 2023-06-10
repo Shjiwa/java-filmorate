@@ -8,8 +8,6 @@ import java.util.Map;
 public interface UserStorage {
     List<User> getUsers();
 
-    Map<Long, User> getMap();
-
     User createUser(User user);
 
     User updateUser(User user);
