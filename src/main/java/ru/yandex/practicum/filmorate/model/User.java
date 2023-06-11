@@ -7,16 +7,22 @@ import ru.yandex.practicum.filmorate.validator.ReplaceNameWithLogin;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Setter
 @Getter
 @NoArgsConstructor
-@Builder
 @Validated
 @ReplaceNameWithLogin
 public class User {
-    private Integer id;
+
+    private Set<Long> friends = new HashSet<>();
+
+    @Positive
+    private Long id;
 
     @NotBlank(message = "Email is null or blank.")
     @Email(message = "Email is not valid.")
@@ -31,7 +37,7 @@ public class User {
 
     private String name;
 
-    public User(Integer id, String email, String login, LocalDate birthday, String name) {
+    public User(Long id, String email, String login, LocalDate birthday, String name) {
         this.id = id;
         this.email = email;
         setLogin(login);
@@ -47,5 +53,9 @@ public class User {
         } else {
             this.login = login;
         }
+    }
+
+    public Set<Long> getFriends() {
+        return friends;
     }
 }
