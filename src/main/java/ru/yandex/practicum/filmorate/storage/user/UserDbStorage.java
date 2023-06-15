@@ -49,7 +49,7 @@ public class UserDbStorage implements UserStorage {
                 .withTableName("USERS")
                 .usingGeneratedKeyColumns("USER_ID");
         user.setId(jdbcInsert.executeAndReturnKey(collectToMap(user)).longValue());
-        log.info("Пользователь: {} создан!", user.getName());
+        log.debug("Пользователь: {} создан!", user.getName());
         return user;
     }
 
@@ -73,7 +73,7 @@ public class UserDbStorage implements UserStorage {
         int rowsCount = jdbcTemplate.update(sql,
                 user.getName(), user.getLogin(), user.getEmail(), user.getBirthday(), user.getId());
         if (rowsCount > 0) {
-            log.info("Пользователь: {} обновлен!", user.getName());
+            log.debug("Пользователь: {} обновлен!", user.getName());
             return user;
         }
         log.error("Not found");
@@ -85,7 +85,7 @@ public class UserDbStorage implements UserStorage {
     public User addFriend(Long id, Long friendId) {
         String sqlQuery = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID) VALUES(?, ?)";
         jdbcTemplate.update(sqlQuery, id, friendId);
-        log.info("Пользователь с id {} и {} теперь друзья!", id, friendId);
+        log.debug("Пользователь с id {} и {} теперь друзья!", id, friendId);
         return getUserById(id);
     }
 
@@ -93,7 +93,7 @@ public class UserDbStorage implements UserStorage {
     public User deleteFriend(Long id, Long friendId) {
         String sql = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
         jdbcTemplate.update(sql, id, friendId);
-        log.info("Пользователь с id {} и {} перестали быть друзьями!", id, friendId);
+        log.debug("Пользователь с id {} и {} перестали быть друзьями!", id, friendId);
         return getUserById(id);
     }
 
@@ -125,22 +125,28 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getFriends(Long id) {
-        String sql = "SELECT *" +
+        String sql = "SELECT U.*" +
                      "FROM USERS " +
-                     "WHERE USER_ID IN(SELECT FRIEND_ID " +
-                                      "FROM FRIENDS " +
-                                      "WHERE USER_ID=?)";
-        return new ArrayList<>(jdbcTemplate.query(sql, this::rowMapToUser, id));
+                     "LEFT JOIN FRIENDS F on USERS.USER_ID = F.USER_ID " +
+                     "LEFT JOIN USERS U on U.USER_ID = F.FRIEND_ID " +
+                     "WHERE USERS.USER_ID = ?";
+        List<User> userList = jdbcTemplate.query(sql, this::rowMapToUser, id);
+        return userList.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     private User rowMapToUser(ResultSet rs, int rowNum) throws SQLException {
+        java.sql.Date birthdayDate = rs.getDate("BIRTHDAY");
+        if (birthdayDate == null) {
+            return null;
+        }
         User user = new User();
         user.setId(rs.getLong("USER_ID"));
         user.setName(rs.getString("USER_NAME"));
         user.setLogin(rs.getString("LOGIN"));
         user.setEmail(rs.getString("EMAIL"));
-        user.setBirthday(rs.getDate("BIRTHDAY").toLocalDate());
-        user.setFriends(getFriends(user.getId()).stream().map(User::getId).collect(Collectors.toSet()));
+        user.setBirthday(birthdayDate.toLocalDate());
+        user.setFriends(new HashSet<>());
+
         return user;
     }
 }
