@@ -83,6 +83,6 @@ class FilmDbStorageTest {
         userDbStorage.createUser(user2);
         filmDbStorage.addLike(1L, 1L);
         filmDbStorage.addLike(1L, 2L);
-        assertEquals(1, filmService.getTop10Films(1).get(0).getId());
+        assertEquals(1, filmService.getTopFilms(1).get(0).getId());
     }
 }

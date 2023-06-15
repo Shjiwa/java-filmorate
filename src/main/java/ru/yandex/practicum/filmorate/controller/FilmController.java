@@ -79,6 +79,6 @@ public class FilmController {
             exceptionService.throwBadRequest("Count is negative: = " + count + ", ожидали положительное");
         }
         log.info("Поступил запрос на получение списка топ {} популярных фильмов", count);
-        return filmService.getTop10Films(count);
+        return filmService.getTopFilms(count);
     }
 }
