@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface MpaStorage {
     List<Mpa> getMpaList();
+
     Mpa getMpa(int id);
+
     Mpa addToFilm(Film film);
 }
