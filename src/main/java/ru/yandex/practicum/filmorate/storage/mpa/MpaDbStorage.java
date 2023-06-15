@@ -21,6 +21,7 @@ import java.util.List;
 public class MpaDbStorage implements MpaStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public List<Mpa> getMpaList() {
         List<Mpa> mpas = new ArrayList<>();
