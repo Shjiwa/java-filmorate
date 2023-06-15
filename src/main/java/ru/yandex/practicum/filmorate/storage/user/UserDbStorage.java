@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,6 +17,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Primary
 @Component
 @RequiredArgsConstructor
@@ -46,6 +48,7 @@ public class UserDbStorage implements UserStorage {
                 .withTableName("USERS")
                 .usingGeneratedKeyColumns("USER_ID");
         user.setId(jdbcInsert.executeAndReturnKey(collectToMap(user)).longValue());
+        log.info("Пользователь: {} создан!", user.getName());
         return user;
     }
 
@@ -69,8 +72,10 @@ public class UserDbStorage implements UserStorage {
         int rowsCount = jdbcTemplate.update(sql,
                 user.getName(), user.getLogin(), user.getEmail(), user.getBirthday(), user.getId());
         if (rowsCount > 0) {
+            log.info("Пользователь: {} обновлен!", user.getName());
             return user;
         }
+        log.error("Not found");
         exceptionService.throwNotFound();
         return user;
     }
@@ -79,6 +84,7 @@ public class UserDbStorage implements UserStorage {
     public User addFriend(Long id, Long friendId) {
         String sqlQuery = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID) VALUES(?, ?)";
         jdbcTemplate.update(sqlQuery, id, friendId);
+        log.info("Пользователь с id {} и {} теперь друзья!", id, friendId);
         return getUserById(id);
     }
 
@@ -86,6 +92,7 @@ public class UserDbStorage implements UserStorage {
     public User deleteFriend(Long id, Long friendId) {
         String sql = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
         jdbcTemplate.update(sql, id, friendId);
+        log.info("Пользователь с id {} и {} перестали быть друзьями!", id, friendId);
         return getUserById(id);
     }
 
@@ -110,6 +117,7 @@ public class UserDbStorage implements UserStorage {
         try {
             return jdbcTemplate.queryForObject(sql, this::rowMapToUser, id);
         } catch (DataAccessException e) {
+            log.error("Not found");
             throw new NotFoundException("User not found");
         }
     }

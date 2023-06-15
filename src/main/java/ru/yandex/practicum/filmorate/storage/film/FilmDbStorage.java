@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+@Slf4j
 @Primary
 @Component
 @RequiredArgsConstructor
@@ -59,6 +61,8 @@ public class FilmDbStorage implements FilmStorage {
         film.setRating(film.getLikes().size());
         mpaDbStorage.addToFilm(film);
         genreDbStorage.addGenre(film);
+
+        log.info("Фильм: {} добавлен!", film.getName());
         return film;
     }
 
@@ -80,8 +84,10 @@ public class FilmDbStorage implements FilmStorage {
         genreDbStorage.updateGenreForFilmInMemory(film);
         film.setGenres(genreDbStorage.getGenre(film.getId()));
         if (rowsCount > 0) {
+            log.info("Фильм: {} обновлен!", film.getName());
             return film;
         }
+        log.error("Not found");
         exceptionService.throwNotFound();
         return film;
     }
@@ -91,6 +97,7 @@ public class FilmDbStorage implements FilmStorage {
         try {
             return jdbcTemplate.queryForObject("SELECT * FROM FILMS WHERE FILM_ID = ?", this::rowMapToFilm, id);
         } catch (DataAccessException e) {
+            log.error("Not found");
             throw new NotFoundException("Film not found");
         }
     }
@@ -98,12 +105,14 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film addLike(Long id, Long userId) {
         jdbcTemplate.update("INSERT INTO LIKES (FILM_ID, USER_ID) VALUES (?,?)", id, userId);
+        log.info("Пользователь с id: {} поставил лайк фильму с id: {}", userId, id);
         return getFilmById(id);
     }
 
     @Override
     public Film deleteLike(Long id, Long userId) {
         jdbcTemplate.update("DELETE FROM LIKES WHERE FILM_ID = ? AND USER_ID = ?", id, userId);
+        log.info("Пользователь с id: {} удалил лайк к фильму с id: {}", userId, id);
         return getFilmById(id);
     }
 
