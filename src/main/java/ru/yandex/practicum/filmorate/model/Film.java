@@ -8,8 +8,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Setter
 @Getter
@@ -21,7 +23,7 @@ public class Film {
 
     private Set<Long> likes = new HashSet<>();
 
-    private Set<Genre> genres = new HashSet<>();
+    private Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
 
     private Long id;
 
