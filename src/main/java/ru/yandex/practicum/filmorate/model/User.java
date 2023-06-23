@@ -14,6 +14,8 @@ import java.util.Set;
 
 @Setter
 @Getter
+@EqualsAndHashCode
+@ToString
 @NoArgsConstructor
 @Validated
 @ReplaceNameWithLogin
@@ -23,6 +25,8 @@ public class User {
 
     @Positive
     private Long id;
+
+    private String name;
 
     @NotBlank(message = "Email is null or blank.")
     @Email(message = "Email is not valid.")
@@ -35,15 +39,6 @@ public class User {
     @Past(message = "Birthday in future.")
     private LocalDate birthday;
 
-    private String name;
-
-    public User(Long id, String email, String login, LocalDate birthday, String name) {
-        this.id = id;
-        this.email = email;
-        setLogin(login);
-        this.birthday = birthday;
-        this.name = name;
-    }
 
     public void setLogin(String login) {
         if (login == null) {
@@ -53,9 +48,5 @@ public class User {
         } else {
             this.login = login;
         }
-    }
-
-    public Set<Long> getFriends() {
-        return friends;
     }
 }

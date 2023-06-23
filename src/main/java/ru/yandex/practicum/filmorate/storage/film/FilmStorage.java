@@ -5,7 +5,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.List;
 
 public interface FilmStorage {
-
     List<Film> getFilms();
 
     Film addFilm(Film film);
@@ -18,5 +17,5 @@ public interface FilmStorage {
 
     Film deleteLike(Long id, Long userId);
 
-    List<Film> getTop10Films(int count);
+    List<Film> getTopFilms(int count);
 }
