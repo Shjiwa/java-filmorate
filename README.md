@@ -1,4 +1,4 @@
-![diagram of project](https://github.com/Shjiwa/-java-filmorate/blob/add-database/ER_diagram.png)
+![diagram of project](https://github.com/Shjiwa/java-filmorate/blob/add-database/ER_diagram.png)
 
 # java-filmorate
 A service that works with movie ratings from users and top recommendations for viewing.
